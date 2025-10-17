@@ -1,0 +1,54 @@
+{
+  "name": "open-with-selection",
+  "displayName": "Open with Selection",
+  "description": "Open files in VS Code with precise text selection from external applications via URI protocol",
+  "version": "0.1.0",
+  "publisher": "xmkj",
+  "author": {
+    "name": "xmkj"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amjunliang/open-with-selection-vscode"
+  },
+  "keywords": [
+    "uri",
+    "protocol",
+    "external",
+    "selection",
+    "jump",
+    "navigation",
+    "integration",
+    "xcode"
+  ],
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "icon": "icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "open-with-selection.selectRange",
+        "title": "Open with Selection: Select Range"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "typescript": "^5.0.0"
+  }
+}
