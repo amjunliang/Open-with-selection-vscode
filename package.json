@@ -2,7 +2,7 @@
   "name": "open-with-selection",
   "displayName": "Open with Selection",
   "description": "Open files in VS Code with precise text selection from external applications via URI protocol",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "xmkj",
   "author": {
     "name": "xmkj"
@@ -30,7 +30,7 @@
   ],
   "icon": "icon.png",
   "activationEvents": [
-    "onStartupFinished"
+    "onUri"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -42,13 +42,20 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./"
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
   },
   "devDependencies": {
     "@types/node": "^18.0.0",
     "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^3.6.2",
+    "esbuild": "^0.19.12",
     "typescript": "^5.0.0"
   }
 }

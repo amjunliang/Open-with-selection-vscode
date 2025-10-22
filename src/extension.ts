@@ -1,12 +1,9 @@
 import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Open with Selection extension activated');
-
     // Register URI Handler
     const uriHandler = vscode.window.registerUriHandler({
         handleUri(uri: vscode.Uri) {
-            console.log('Received URI:', uri.toString());
             
             // Parse URI parameters
             // Format: vscode://publisher.open-with-selection/open?file=/path/to/file&sl=10&sc=5&el=10&ec=20
@@ -48,7 +45,7 @@ async function openFileWithSelection(
     endColumn: number
 ) {
     try {
-        // VS Code uses 0-based indexing, but we receive 1-based
+        // VS Code uses 0-based indexing internally; clamp negatives just in case
         const start = new vscode.Position(
             Math.max(0, startLine - 1),
             Math.max(0, startColumn - 1)
@@ -57,28 +54,23 @@ async function openFileWithSelection(
             Math.max(0, endLine - 1),
             Math.max(0, endColumn - 1)
         );
-
-        // Open document
-        const document = await vscode.workspace.openTextDocument(filePath);
-        const editor = await vscode.window.showTextDocument(document);
-
-        // Set selection
-        editor.selection = new vscode.Selection(start, end);
-
-        // Scroll to visible area
-        editor.revealRange(
-            new vscode.Range(start, end),
-            vscode.TextEditorRevealType.InCenterIfOutsideViewport
+        const selectionRange = new vscode.Range(
+            start.isBeforeOrEqual(end) ? start : end,
+            start.isBeforeOrEqual(end) ? end : start
         );
 
-        console.log(`✅ Successfully opened file with selection: ${filePath} (${startLine}:${startColumn}) -> (${endLine}:${endColumn})`);
+        // Let VS Code open the document directly from the URI so we avoid double-loading it
+        const editor = await vscode.window.showTextDocument(vscode.Uri.file(filePath), {
+            preview: false,
+            selection: selectionRange
+        });
+
+        // Preserve the intended anchor/active ordering after the editor is ready
+        editor.selection = new vscode.Selection(start, end);
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         vscode.window.showErrorMessage(`Failed to open file: ${message}`);
-        console.error('Failed to open file:', error);
     }
 }
 
-export function deactivate() {
-    console.log('Open with Selection extension deactivated');
-}
+export function deactivate() {}
